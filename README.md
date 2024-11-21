@@ -34,7 +34,7 @@ Follow these instructions to set up the application on your local machine.
      ```env
      DB_HOST=localhost
      DB_USER=yourUsername
-     DB_PASSWORD=yourPassword
+     DB_PASSWORD=yourPasswordonMYSQLWorkBench
      DB_NAME=yourDatabaseName
      DB_PORT=3306
      ```
@@ -69,37 +69,6 @@ Follow these instructions to set up the application on your local machine.
 
 ---
 
-## **Next Steps**
-
-1. **Implement Routes**:
-   - Add route handlers in the `src/routes/` folder to define the API endpoints.
-
-2. **Add Models**:
-   - Define database models in the `src/models/` folder for each table in your database.
-
-3. **Middleware**:
-   - Use the `src/middleware/` folder to implement validation or logging utilities.
-
----
-
-## **Contribution Guidelines**
-
-1. **Create a New Branch**:
-   - Work on a feature branch to avoid conflicts:
-     ```bash
-     git checkout -b feature/<feature_name>
-     ```
-
-2. **Push Your Changes**:
-   - Push your branch to the remote repository:
-     ```bash
-     git push origin feature/<feature_name>
-     ```
-
-3. **Create a Pull Request**:
-   - Open a pull request for review and merge into the main branch.
-s
----
 
 ## **Troubleshooting**
 
