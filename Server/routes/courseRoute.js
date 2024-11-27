@@ -1,135 +1,126 @@
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2');
+const connection = require('../config/db'); // Import the database connection
 
-// MySQL connection
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Sumail123',
-    database: 'prisoner_System',
-});
+
+// // MySQL connection
+// const db = mysql.createConnection({
+//   host: 'localhost',
+//   user: 'root',
+//   password: 'Sumail123',
+//   database: 'prisoner_System',
+// });
 
 // Middleware to parse JSON requests
 router.use(express.json());
 
-/**
- * Enroll in Course
- */
-router.post('/enroll', (req, res) => {
-    const { prisonerID, programID } = req.body;
+// Helper functions
+function isPositiveInteger(value) {
+  return Number.isInteger(value) && value > 0;
+}
 
-    // Validate programID and prisonerID exist
-    const validateQuery = `
-        SELECT (SELECT COUNT(*) FROM education_Course WHERE programID = ?) AS validProgram,
-               (SELECT COUNT(*) FROM prisoner WHERE prisonerID = ?) AS validPrisoner;
+// Middleware for validation
+function validateEnroll(req, res, next) {
+  const { prisonerID, programID } = req.body;
+
+  const parsedPrisonerID = parseInt(prisonerID, 10);
+  const parsedProgramID = parseInt(programID, 10);
+
+  if (!isPositiveInteger(parsedPrisonerID) || !isPositiveInteger(parsedProgramID)) {
+    return res.status(400).json({ error: 'Prisoner ID and Program ID must be positive integers.' });
+  }
+
+  req.body.prisonerID = parsedPrisonerID;
+  req.body.programID = parsedProgramID;
+
+  next();
+}
+
+// Enroll in Course
+router.post('/enroll', validateEnroll, (req, res) => {
+  const { prisonerID, programID } = req.body;
+
+  const capacityCheckQuery = `
+    SELECT capacity, enrolment FROM education_Course WHERE programID = ?;
+  `;
+  connection.query(capacityCheckQuery, [programID], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error checking course capacity.' });
+    if (results.length === 0) return res.status(404).json({ error: 'Course not found.' });
+
+    const { capacity, enrolment } = results[0];
+    if (enrolment >= capacity) {
+      return res.status(400).json({ error: 'Course is already full.' });
+    }
+
+    const enrollQuery = `
+      INSERT INTO prisoner_Education (prisonerID, programID, grade, attendance)
+      VALUES (?, ?, NULL, NULL);
     `;
-    db.query(validateQuery, [programID, prisonerID], (err, results) => {
-        if (err) return res.status(500).send('Error validating IDs.');
-
-        const [validation] = results;
-        if (validation.validProgram === 0) return res.status(404).send('Program not found.');
-        if (validation.validPrisoner === 0) return res.status(404).send('Prisoner not found.');
-
-        // Check course capacity
-        const capacityCheckQuery = `
-            SELECT capacity, enrolment
-            FROM education_Course
-            WHERE programID = ?;
-        `;
-        db.query(capacityCheckQuery, [programID], (err, results) => {
-            if (err) return res.status(500).send('Error checking course capacity.');
-
-            const { capacity, enrolment } = results[0];
-            if (enrolment >= capacity) {
-                return res.status(400).send('Course is already full.');
-            }
-
-            // Enroll prisoner in course
-            const enrollQuery = `
-                INSERT INTO prisoner_Education (prisonerID, programID, grade, attendance)
-                VALUES (?, ?, NULL, NULL);
-            `;
-            db.query(enrollQuery, [prisonerID, programID], (err, results) => {
-                if (err) return res.status(500).send('Error enrolling prisoner in course.');
-                res.status(200).send('Prisoner successfully enrolled in course.');
-            });
-        });
+    connection.query(enrollQuery, [prisonerID, programID], (err) => {
+      if (err) return res.status(500).json({ error: 'Error enrolling prisoner in course.' });
+      res.status(200).json({ message: 'Prisoner successfully enrolled in course.' });
     });
+  });
 });
 
-/**
- * Remove from Course
- */
-router.delete('/remove', (req, res) => {
-    const { prisonerID, programID } = req.body;
+// Remove from Course
+router.delete('/remove', validateEnroll, (req, res) => {
+  const { prisonerID, programID } = req.body;
 
-    // Remove enrollment record
-    const removeQuery = `
-        DELETE FROM prisoner_Education
-        WHERE prisonerID = ? AND programID = ?;
-    `;
-    db.query(removeQuery, [prisonerID, programID], (err, results) => {
-        if (err) return res.status(500).send('Error removing prisoner from course.');
-        if (results.affectedRows === 0) {
-            return res.status(404).send('No enrollment record found for this prisoner and course.');
-        }
-        res.status(200).send('Prisoner successfully removed from course.');
-    });
+  const removeQuery = `
+    DELETE FROM prisoner_Education WHERE prisonerID = ? AND programID = ?;
+  `;
+  connection.query(removeQuery, [prisonerID, programID], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error removing prisoner from course.' });
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ error: 'Enrollment not found.' });
+    }
+    res.status(200).json({ message: 'Prisoner successfully removed from course.' });
+  });
 });
 
-/**
- * Course Summary
- */
-router.get('/summary', (req, res) => {
-    const summaryQuery = `
-        SELECT programID, programName, programType, instructorName, capacity, enrolment
-        FROM education_Course;
-    `;
-    db.query(summaryQuery, (err, results) => {
-        if (err) return res.status(500).send('Error retrieving course summary.');
-        res.status(200).json(results);
-    });
-});
-
-/**
- * Update Grade and Attendance
- */
+// Update Grade and Attendance
 router.put('/update-grade-attendance', (req, res) => {
-    const { prisonerID, programID, grade, attendance } = req.body;
+  const { prisonerID, programID, grade, attendance } = req.body;
 
-    // Validate grade and attendance values
-    if (grade < 0 || grade > 100) {
-        return res.status(400).send('Grade must be between 0 and 100.');
+  if (!isPositiveInteger(prisonerID) || !isPositiveInteger(programID)) {
+    return res.status(400).json({ error: 'Prisoner ID and Program ID must be positive integers.' });
+  }
+  if (grade < 0 || grade > 100 || attendance < 0 || attendance > 100) {
+    return res.status(400).json({ error: 'Grade and Attendance must be between 0 and 100.' });
+  }
+
+  const updateQuery = `
+    UPDATE prisoner_Education
+    SET grade = ?, attendance = ?
+    WHERE prisonerID = ? AND programID = ?;
+  `;
+  connection.query(updateQuery, [grade, attendance, prisonerID, programID], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error updating grade and attendance.' });
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ error: 'Enrollment not found.' });
     }
-    if (attendance < 0 || attendance > 100) {
-        return res.status(400).send('Attendance must be between 0 and 100.');
-    }
+    res.status(200).json({ message: 'Grade and Attendance successfully updated.' });
+  });
+});
 
-    // Check if the enrollment exists
-    const validateEnrollmentQuery = `
-        SELECT COUNT(*) AS enrollmentExists
-        FROM prisoner_Education
-        WHERE prisonerID = ? AND programID = ?;
-    `;
-    db.query(validateEnrollmentQuery, [prisonerID, programID], (err, results) => {
-        if (err) return res.status(500).send('Error validating enrollment.');
-        const { enrollmentExists } = results[0];
-        if (!enrollmentExists) {
-            return res.status(404).send('Enrollment not found for this prisoner and course.');
-        }
+// Course Summary
+router.get('/summary', (req, res) => {
+  const summaryQuery = `
+    SELECT programID, 
+           COALESCE(programName, '') AS programName, 
+           COALESCE(programType, '') AS programType, 
+           COALESCE(instructorName, '') AS instructorName, 
+           capacity, 
+           enrolment
+    FROM education_Course;
+  `;
 
-        // Update grade and attendance
-        const updateQuery = `
-            UPDATE prisoner_Education
-            SET grade = ?, attendance = ?
-            WHERE prisonerID = ? AND programID = ?;
-        `;
-        db.query(updateQuery, [grade, attendance, prisonerID, programID], (err, results) => {
-            if (err) return res.status(500).send('Error updating grade and attendance.');
-            res.status(200).send('Grade and attendance successfully updated.');
-        });
-    });
+  connection.query(summaryQuery, (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error retrieving course summary.' });
+    res.status(200).json(results);
+  });
 });
 
 module.exports = router;
