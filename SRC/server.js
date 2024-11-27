@@ -43,10 +43,11 @@ connection.connect((err) => {
 
 const prisonerRoute = require('./routes/prisonerRoute'); // Adjust path as needed
 const cellRoute = require('./routes/cellRoute'); // Adjust path as needed
-
+const guardRoutes = require('./routes/guardRoutes'); // Adjust path as needed
 // Use routes
 app.use('/api/prisoners', prisonerRoute);
 app.use('/api/cells', cellRoute);
+app.use('/api/guards', guardRoutes);
 
 
 app.listen(PORT, () => {
