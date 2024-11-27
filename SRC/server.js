@@ -1,5 +1,13 @@
 const connection = require('./config/db');
+const express = require('express');
+const app = express();
+const router = express.Router()
 
+app.use(express.json())
+//app.use('/api/prison', router)
+
+router.use(express.json())
+const PORT = process.env.PORT || 3000;
 connection.connect((err) => {
   if (err) {
     console.error('Error connecting to MySQL:', err.stack);
@@ -28,6 +36,19 @@ connection.connect((err) => {
     });
 
     console.log('---------------------------'); // Dashed line
-    process.exit(0);
   });
-});
+
+})
+
+
+const prisonerRoute = require('./routes/prisonerRoute'); // Adjust path as needed
+const cellRoute = require('./routes/cellRoute'); // Adjust path as needed
+
+// Use routes
+app.use('/api/prisoners', prisonerRoute);
+app.use('/api/cells', cellRoute);
+
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+})
