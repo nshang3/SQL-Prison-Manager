@@ -10,6 +10,8 @@ document.querySelectorAll('.nav-btn').forEach(button => {
       window.location.href = './functionalities/manage-salary/manage-salary.html';
     } else if (route === 'reports') {
       alert('Feature coming soon!');
+    } else if (route === 'courses') {
+      window.location.href = './functionalities/manage-courses/manage-courses.html';
     }
   });
 });
