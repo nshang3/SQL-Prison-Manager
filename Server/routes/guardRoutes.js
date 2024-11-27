@@ -13,8 +13,14 @@ router.get('/guards-in-maximum-security', (req, res) => {
 
   connection.query(query, (err, results) => {
     if (err) {
-      console.error('Error fetching guards in Maximum security:', err);
+      console.error('Error fetching guards in Maximum security:', err.message);
       return res.status(500).json({ error: 'Failed to fetch guards' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({
+        message: 'No guards found in Maximum security level',
+      });
     }
 
     res.status(200).json({
@@ -29,11 +35,19 @@ router.put('/update-salary', (req, res) => {
   const { badgeNo, multiplier } = req.body;
 
   // Validate the required parameters
-  if (!badgeNo || !multiplier || isNaN(multiplier)) {
+  if (!badgeNo || typeof badgeNo !== 'string' || badgeNo.trim() === '') {
     return res.status(400).json({
-      error: 'Missing or invalid parameters: badgeNo and multiplier are required, and multiplier must be a number',
+      error: 'Invalid badgeNo: badgeNo is required and must be a non-empty string',
     });
   }
+
+  if (!multiplier || isNaN(multiplier) || multiplier <= 0) {
+    return res.status(400).json({
+      error: 'Invalid multiplier: multiplier is required and must be a positive number',
+    });
+  }
+
+  const sanitizedMultiplier = parseFloat(multiplier);
 
   // SQL query to update guard salary
   const query = `
@@ -49,11 +63,11 @@ router.put('/update-salary', (req, res) => {
   `;
 
   console.log('Executing query:', query); // Log query
-  console.log('Parameters:', multiplier, badgeNo); // Log parameters
+  console.log('Parameters:', sanitizedMultiplier, badgeNo); // Log parameters
 
-  connection.query(query, [multiplier, badgeNo], (err, result) => {
+  connection.query(query, [sanitizedMultiplier, badgeNo], (err, result) => {
     if (err) {
-      console.error('Error executing the query:', err);
+      console.error('Error executing the query:', err.message);
       return res.status(500).json({ error: 'Failed to update guard salary' });
     }
 
@@ -89,8 +103,14 @@ router.get('/guards-with-cell-assignments', (req, res) => {
 
   connection.query(query, (err, results) => {
     if (err) {
-      console.error('Error fetching guards with cell assignments:', err);
+      console.error('Error fetching guards with cell assignments:', err.message);
       return res.status(500).json({ error: 'Failed to fetch guards with cell assignments' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({
+        message: 'No guards with cell assignments found',
+      });
     }
 
     res.status(200).json({
