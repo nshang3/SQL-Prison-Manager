@@ -47,6 +47,16 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get()
+// GET route to fetch all cells
+router.get('/', async (req, res) => {
+  try {
+    const [rows] = await connection.promise().query('SELECT * FROM cell');
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error('Error fetching cells:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
 
