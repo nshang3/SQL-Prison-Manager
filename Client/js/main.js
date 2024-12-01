@@ -14,6 +14,8 @@ document.querySelectorAll('.nav-btn').forEach(button => {
       window.location.href = './functionalities/manage-courses/manage-courses.html';
     } else if (route === 'prisoners'){
       window.location.href = './functionalities/manage-prisoners/manage-prisoners.html';
+    } else if (route === 'cells'){
+      window.location.href = './functionalities/manage-cells/manage-cells.html';
     }
   });
 });

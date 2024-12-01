@@ -5,6 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manage Prisoners</title>
   <link rel="stylesheet" href="../../css/style.css">
+  <style>
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 400px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -12,10 +45,10 @@
   </header>
   <main>
     <div class="button-container">
-        <button>Add prisoner</button>
+        <button id="addPrisonerBtn">Add prisoner</button>
     </div>
     <section>
-      <h2>Guards and Their Cell Assignments</h2>
+      <h2>List of Prisoners</h2>
       <table id="prisonersTable" border="1">
         <thead>
           <tr>
@@ -40,6 +73,47 @@
   <footer>
     <p>&copy; 2024 Guard Management System</p>
   </footer>
+
+
+  <div id="prisonerModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Add New Prisoner</h2>
+      <form id="prisonerForm">
+        <label for="prisonerID">Prisoner ID:</label>
+        <input type="number" id="prisonerID" name="prisonerID" required><br><br>
+
+        <label for="cellNo">Cell No:</label>
+        <input type="text" id="cellNo" name="cellNo" required><br><br>
+
+        <label for="prisonerName">Prisoner Name:</label>
+        <input type="text" id="prisonerName" name="prisonerName" required><br><br>
+
+        <label for="dateOfBirth">Date of Birth:</label>
+        <input type="date" id="dateOfBirth" name="dateOfBirth" required><br><br>
+
+        <label for="heightCm">Height (cm):</label>
+        <input type="number" id="heightCm" name="heightCm" required><br><br>
+
+        <label for="weightKg">Weight (kg):</label>
+        <input type="number" id="weightKg" name="weightKg" required><br><br>
+
+        <label for="eyeColor">Eye Color:</label>
+        <input type="text" id="eyeColor" name="eyeColor" required><br><br>
+
+        <label for="hairColor">Hair Color:</label>
+        <input type="text" id="hairColor" name="hairColor" required><br><br>
+
+        <label for="offenseType">Offense Type:</label>
+        <input type="text" id="offenseType" name="offenseType" required><br><br>
+
+        <label for="dangerLevel">Danger Level:</label>
+        <input type="text" id="dangerLevel" name="dangerLevel" required><br><br>
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
   <script src="./prisoners.js"></script>
 </body>
 </html>
