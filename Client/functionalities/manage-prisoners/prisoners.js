@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
       e.preventDefault(); // Prevent form from submitting normally
   
       const newPrisoner = {
-        prisonerID: document.getElementById('prisonerID').value,
+
         cellNo: document.getElementById('cellNo').value,
         prisonerName: document.getElementById('prisonerName').value,
         dateOfBirth: document.getElementById('dateOfBirth').value,
@@ -67,8 +67,27 @@ document.addEventListener('DOMContentLoaded', function () {
         dangerLevel: document.getElementById('dangerLevel').value,
       };
   
-      // You can now send the new prisoner data to the server (using fetch or AJAX)
-      console.log(newPrisoner);
+      fetch('/api/prisoners', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newPrisoner),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('prisoner added successfully:', data);
+        if (data.message) {
+          alert(data.message);
+          fetchPrisoners(); 
+        } else {
+          alert('An error occurred while adding the cell.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while adding the cell.');
+      });
   
       // Close the modal after form submission
       modal.style.display = "none";
