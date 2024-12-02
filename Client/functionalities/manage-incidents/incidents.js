@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchIncidents(date);
   });
 
-  // Refresh the list back to all data (original view)
+  // Refresh the list back to all data
   refreshBtn.addEventListener('click', function () {
     dateFilter.value = ''; // Clear the date filter input
     fetchIncidents(); // Fetch all data
