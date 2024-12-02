@@ -96,3 +96,54 @@ document.addEventListener('DOMContentLoaded', function () {
       form.reset();
     };
   });
+
+document.addEventListener('DOMContentLoaded', function () {
+  const fetchSecurityBtn = document.getElementById('fetchSecurityBtn');
+  const securityModal = document.getElementById('securityModal');
+  const closeSecurityModal = document.getElementById('closeSecurityModal');
+  const securityDataList = document.getElementById('securityDataList');
+
+  // Function to fetch and display security level data
+  function fetchPrisonersBySecurityLevel() {
+    fetch('/api/prisoners/prisoners-by-security-level')
+      .then(response => response.json())
+      .then(data => {
+        securityDataList.innerHTML = ''; // Clear existing data
+
+        if (!data.data || data.data.length === 0) {
+          const listItem = document.createElement('li');
+          listItem.textContent = 'No data available';
+          securityDataList.appendChild(listItem);
+          return;
+        }
+
+        data.data.forEach(item => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `${item.securityLevel} Security: ${item.numberOfPrisoners} Prisoners`;
+          securityDataList.appendChild(listItem);
+        });
+
+        // Show the modal after fetching data
+        securityModal.style.display = 'block';
+      })
+      .catch(err => {
+        console.error('Error fetching security levels:', err);
+        alert('An error occurred while fetching the data. Please try again later.');
+      });
+  }
+
+  // Open modal when button is clicked
+  fetchSecurityBtn.addEventListener('click', fetchPrisonersBySecurityLevel);
+
+  // Close modal when the "X" button is clicked
+  closeSecurityModal.addEventListener('click', function () {
+    securityModal.style.display = 'none';
+  });
+
+  // Close modal if the user clicks outside the modal content
+  window.addEventListener('click', function (event) {
+    if (event.target === securityModal) {
+      securityModal.style.display = 'none';
+    }
+  });
+});

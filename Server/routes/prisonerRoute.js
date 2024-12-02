@@ -61,4 +61,29 @@ router.post('/', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+// Route to get the number of prisoners grouped by security level
+router.get('/prisoners-by-security-level', (req, res) => {
+  const query = `
+    SELECT cb.securityLevel, COUNT(p.prisonerID) AS numberOfPrisoners
+    FROM cell_Block cb
+    JOIN cell c ON cb.cellBlockID = c.cellBlockID
+    JOIN prisoner p ON c.cellNo = p.cellNo
+    GROUP BY cb.securityLevel;
+  `;
+
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching prisoners by security level:', err.message);
+      return res.status(500).json({ error: 'Failed to fetch data' });
+    }
+
+    res.status(200).json({
+      message: 'Prisoners by security level fetched successfully',
+      data: results,
+    });
+  });
+});
+
+
 module.exports = router;
