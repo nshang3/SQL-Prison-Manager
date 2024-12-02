@@ -147,3 +147,60 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 });
+
+// Adjust Threat Level
+document.addEventListener('DOMContentLoaded', function () {
+  const threatModal = document.getElementById('threatModal');
+  const adjustThreatBtn = document.getElementById('adjustThreatBtn');
+  const closeThreatModal = document.getElementById('closeThreatModal');
+  const threatForm = document.getElementById('threatForm');
+
+  // Open modal when "Adjust Threat Level" button is clicked
+  adjustThreatBtn.onclick = function () {
+    threatModal.style.display = "block";
+  };
+
+  // Close modal when the "X" button is clicked
+  closeThreatModal.onclick = function () {
+    threatModal.style.display = "none";
+  };
+
+  // Close modal if the user clicks outside the modal content
+  window.onclick = function (event) {
+    if (event.target == threatModal) {
+      threatModal.style.display = "none";
+    }
+  };
+
+  // Handle form submission
+  threatForm.onsubmit = function (e) {
+    e.preventDefault(); // Prevent form from submitting normally
+
+    const prisonerID = document.getElementById('prisonerID').value;
+    const newThreatLevel = document.getElementById('newThreatLevel').value;
+
+    fetch('/api/prisoners/adjust-threat-level', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prisonerID, newThreatLevel }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message) {
+          alert(data.message);
+          fetchPrisoners(); // Refresh the prisoner list
+        } else {
+          alert('An error occurred while adjusting the threat level.');
+        }
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        alert('An error occurred while adjusting the threat level.');
+      });
+
+    // Close the modal after form submission
+    threatModal.style.display = "none";
+    threatForm.reset(); // Clear form fields
+  };
+});
+

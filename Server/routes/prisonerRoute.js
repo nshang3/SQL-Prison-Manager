@@ -85,5 +85,38 @@ router.get('/prisoners-by-security-level', (req, res) => {
   });
 });
 
+// Adjust Danger Level (Threat Level)
+router.put('/adjust-threat-level', (req, res) => {
+  const { prisonerID, newThreatLevel } = req.body;
+
+  // Validate inputs
+  if (!prisonerID || !newThreatLevel) {
+    return res.status(400).json({ error: 'Prisoner ID and new threat level are required.' });
+  }
+
+  if (!['Low', 'Medium', 'High'].includes(newThreatLevel)) {
+    return res.status(400).json({ error: 'Invalid threat level. Must be Low, Medium, or High.' });
+  }
+
+  const query = `
+    UPDATE prisoner
+    SET dangerLevel = ?
+    WHERE prisonerID = ?;
+  `;
+
+  connection.query(query, [newThreatLevel, prisonerID], (err, results) => {
+    if (err) {
+      console.error('Error updating threat level:', err.message);
+      return res.status(500).json({ error: 'Failed to update threat level.' });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ error: 'Prisoner not found.' });
+    }
+
+    res.status(200).json({ message: 'Threat level updated successfully.' });
+  });
+});
+
 
 module.exports = router;
