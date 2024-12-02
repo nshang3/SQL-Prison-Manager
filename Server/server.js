@@ -48,10 +48,12 @@ const prisonerRoute = require('./routes/prisonerRoute');
 const cellRoute = require('./routes/cellRoute');
 const guardRoutes = require('./routes/guardRoutes');
 const courseRoutes = require('./routes/courseRoute')
+const incidentRoutes = require('./routes/incidentRoute')
 app.use('/api/prisoners', prisonerRoute);
 app.use('/api/cells', cellRoute);
 app.use('/api/guards', guardRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/incidents', incidentRoutes);
 
 // Route to serve the homepage (index.html)
 app.get('/', (req, res) => {
