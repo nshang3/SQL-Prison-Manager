@@ -54,7 +54,6 @@ app.use('/api/cells', cellRoute);
 app.use('/api/guards', guardRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/incidents', incidentRoutes);
-app.use('/api/cells', cellRoute);
 
 // Route to serve the homepage (index.html)
 app.get('/', (req, res) => {
