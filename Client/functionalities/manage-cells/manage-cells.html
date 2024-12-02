@@ -4,13 +4,48 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manage Guards</title>
-  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/style.css"><style>
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 400px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <header>
-    <h1>Manage Guards</h1>
+    <h1>Manage Cells</h1>
   </header>
   <main>
+    <div class="button-container">
+        <button id="addCellBtn">Add Cell</button>
+    </div>
     <section>
       <h2>Cells </h2>
       <table id="cellsTable" border="1">
@@ -33,6 +68,27 @@
   <footer>
     <p>&copy; 2024 Guard Management System</p>
   </footer>
+
+  <div id="cellModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Add New Prisoner</h2>
+      <form id="cellForm">
+        <label for="cellBlockID">CellBlock ID:</label>
+        <input type="number" id="cellBlockID" name="cellBlockID" required><br><br>
+
+        <label for="cellType">Cell Type:</label>
+        <input type="text" id="cellType" name="cellType" required><br><br>
+
+        <label for="floorNo">Floor Number:</label>
+        <input type="number" id="floorNo" name="floorNo" min="1" max="3" required><br><br>
+
+        
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
   <script src="./cells.js"></script>
 </body>
 </html>

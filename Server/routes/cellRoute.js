@@ -47,16 +47,42 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET route to fetch all cells
-router.get('/', async (req, res) => {
-  try {
-    const [rows] = await connection.promise().query('SELECT * FROM cell');
-    res.status(200).json(rows);
-  } catch (err) {
-    console.error('Error fetching cells:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+router.get('/get-cells', (req, res) => {
+  const query = `
+    SELECT 
+    c.cellNo, 
+    c.cellBlockID,  
+    c.cellType,
+    c.floorNo,
+    cb.capacity,
+    cb.occupancy
+  FROM 
+    cell c
+  LEFT JOIN 
+    cell_Block cb 
+  ON 
+    c.cellBlockID = cb.cellBlockID
+  ORDER BY 
+    cb.cellBlockID;
+  `;
 
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching cells and their corresponding cell blocks:', err.message);
+      return res.status(500).json({ error: 'Failed to cells with their cell blocks' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({
+        message: 'No cells with cellblocks assignments found',
+      });
+    }
+
+    res.status(200).json({
+      message: 'cells with cell blocks fetched successfully',
+      cells: results,
+    });
+  });
+})
 module.exports = router;
 
