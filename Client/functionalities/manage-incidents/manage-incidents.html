@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Incidents</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <style>
+    /* Styles for the page */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid black;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .filter-container {
+      margin-bottom: 20px;
+    }
+    .filter-container label, .filter-container input, .filter-container button {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Manage Incidents</h1>
+  </header>
+  <main>
+    <section>
+      <div class="filter-container">
+        <label for="dateFilter">Enter Date:</label>
+        <input type="date" id="dateFilter" name="dateFilter" required>
+        <button id="fetchIncidentsBtn">Fetch Incidents</button>
+        <button id="refreshBtn">View All Data</button>
+      </div>
+      <h2>List of Incidents</h2>
+      <table id="incidentsTable">
+        <thead>
+          <tr>
+            <th>Incident Report ID</th>
+            <th>Prisoner ID</th>
+            <th>Badge Number</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be dynamically inserted here -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2024 Incident Management System</p>
+  </footer>
+  <script src="./incidents.js"></script>
+</body>
+</html>
