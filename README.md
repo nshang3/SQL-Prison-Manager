@@ -17,7 +17,7 @@ Follow these instructions to set up the application on your local machine.
 1. **Clone the Repository**:
    ```bash
    git clone <REPO_URL>
-   cd assignment-4-group-19
+   cd SQL-Prison-Manager
    ```
 
 2. **Install Dependencies**:
